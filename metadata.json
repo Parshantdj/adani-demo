@@ -1,0 +1,7 @@
+{
+  "name": "iSafetyRobo: Adani Safety Expo ",
+  "description": "A comprehensive AI-driven safety, security, and compliance dashboard designed for high-stakes Indian automobile manufacturing environments, featuring real-time PPE detection, fire alerts, and SOP-driven incident response.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
