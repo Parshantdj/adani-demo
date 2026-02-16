@@ -81,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, col
               placeholder="Quick search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-[#000c17] border border-slate-700/30 rounded-lg py-2.5 pl-10 pr-4 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all"
+              className="w-full bg-gray-200 border border-slate-700/30 rounded-lg py-2.5 pl-10 pr-4 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" size={14} />
           </div>

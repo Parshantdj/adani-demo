@@ -119,8 +119,8 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
   };
 
   const kpiData = [
-    { label: 'PPE Compliance', value: `${generateScore(96, 4)}%`, change: getSeededRandom(seed + 'ppe') > 0.5 ? '+0.5%' : '-0.2%', trend: getSeededRandom(seed + 'ppe') > 0.5 ? 'up' : 'down', icon: <HardHat className="text-primary" />, color: 'bg-primary-50' },
-    { label: 'Fire & Smoke Safety', value: '100%', change: 'Stable', trend: 'neutral', icon: <Flame className="text-red-600" />, color: 'bg-red-50' },
+    { label: 'Score PPE Compliance', value: `${generateScore(96, 4)}%`, change: getSeededRandom(seed + 'ppe') > 0.5 ? '+0.5%' : '-0.2%', trend: getSeededRandom(seed + 'ppe') > 0.5 ? 'up' : 'down', icon: <HardHat className="text-primary" />, color: 'bg-primary-50' },
+    { label: 'Score Fire & Smoke Safety', value: '100%', change: 'Stable', trend: 'neutral', icon: <Flame className="text-red-600" />, color: 'bg-red-50' },
     { label: 'Overcrowding Score', value: `${generateScore(92, 5)}%`, change: '-1.2%', trend: 'down', icon: <Users className="text-orange-600" />, color: 'bg-orange-50' },
     { label: 'Violence-Free Score', value: '99.9%', change: '+0.1%', trend: 'up', icon: <ShieldAlert className="text-purple-600" />, color: 'bg-purple-50' },
     { label: 'Identity Match Rate', value: `${generateScore(98, 2)}%`, change: '+0.8%', trend: 'up', icon: <ScanFace className="text-emerald-600" />, color: 'bg-emerald-50' },
@@ -141,14 +141,34 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
     }
   };
 
+  // Handle respond for a specific event
+  const handleRespondToEvent = (event: any) => {
+    onRespond?.({ type: event.type, zone: event.zone });
+  };
+
+  // Derived data for Active Incidents Modal
+  const activeIncidentsData = useMemo(() => {
+    return filteredIncidents.filter(inc => inc.status === IncidentStatus.ACTIVE).map(inc => {
+      const stageIndex = getMockStageIndex(inc.id);
+      return {
+        ...inc,
+        currentStage: LIFECYCLE_STAGES[stageIndex],
+        progress: ((stageIndex + 1) / LIFECYCLE_STAGES.length) * 100,
+        severityColor: inc.severity === IncidentSeverity.CRITICAL ? 'text-red-600' : 'text-orange-600',
+        severityBg: inc.severity === IncidentSeverity.CRITICAL ? 'bg-red-50' : 'bg-orange-50',
+        severityBorder: inc.severity === IncidentSeverity.CRITICAL ? 'border-red-100' : 'border-orange-100',
+      };
+    });
+  }, [filteredIncidents]);
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
 
       {/* Dynamic Pop-up Banner - Widgets move up when this is null */}
-      {isBannerVisible && activeEvent && (
+      {activeEvent && (
         <div key={activeEvent.id} className="group relative overflow-hidden rounded-2xl border border-red-200 bg-white/80 backdrop-blur-md shadow-xl shadow-red-500/5 transition-all duration-300 animate-in fade-in slide-in-from-top-4">
           {/* Striped Red Animated Background */}
-          <div className="absolute inset-0 opacity-[0.03] bg-[repeating-linear-gradient(45deg,red_0,red_1px,transparent_0,transparent_10px)] animate-[shimmer_20s_linear_infinite]"></div>
+          <div className="absolute inset-0 opacity-[0.03] bg-[repeating-linear-gradient(45deg,red_0,red_1px,transparent_0,transparent_10px)] animate-[shimmer_50s_linear_infinite]"></div>
 
           <div className="relative flex items-center justify-between p-4 px-6">
             <div className="flex items-center gap-5">
@@ -186,8 +206,8 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
               key={idx}
               onClick={() => isActiveIncidents && setShowActiveIncidentsModal(true)}
               className={`bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition-all ${isActiveIncidents
-                  ? 'cursor-pointer hover:shadow-lg hover:border-red-200 group relative overflow-hidden'
-                  : 'hover:shadow-md'
+                ? 'cursor-pointer hover:shadow-lg hover:border-red-200 group relative overflow-hidden'
+                : 'hover:shadow-md'
                 }`}
             >
               {isActiveIncidents && (
@@ -241,6 +261,10 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
                 {
                   data: [100, 100, 99.5, 100, 100, 100, 99.9],
                   label: 'Violence-Free %', color: '#8b5cf6', showMark: false
+                },
+                {
+                  data: [90, 90, 92.5, 93.5, 94.5, 95.5, 96.5],
+                  label: 'Fire & Smoke Safety %', color: 'red', showMark: false
                 }
               ]}
               xAxis={[{ scaleType: 'point', data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] }]}
@@ -429,8 +453,8 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
                             return (
                               <div key={stage} className="flex flex-col items-center gap-3 w-20">
                                 <div className={`w-9 h-9 rounded-full flex items-center justify-center border-[3px] transition-all duration-300 ${isCompleted ? 'bg-primary border-primary text-white' :
-                                    isCurrent ? 'bg-white border-primary text-primary shadow-lg shadow-primary-100 scale-110' :
-                                      'bg-white border-slate-200 text-slate-300'
+                                  isCurrent ? 'bg-white border-primary text-primary shadow-lg shadow-primary-100 scale-110' :
+                                    'bg-white border-slate-200 text-slate-300'
                                   }`}>
                                   {isCompleted ? <CheckCircle2 size={16} strokeWidth={3} /> :
                                     isCurrent ? <Loader2 size={18} className="animate-spin" /> :
