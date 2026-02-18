@@ -119,8 +119,8 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
   };
 
   const kpiData = [
-    { label: 'Score PPE Compliance', value: `${generateScore(96, 4)}%`, change: getSeededRandom(seed + 'ppe') > 0.5 ? '+0.5%' : '-0.2%', trend: getSeededRandom(seed + 'ppe') > 0.5 ? 'up' : 'down', icon: <HardHat className="text-primary" />, color: 'bg-primary-50' },
-    { label: 'Score Fire & Smoke Safety', value: '100%', change: 'Stable', trend: 'neutral', icon: <Flame className="text-red-600" />, color: 'bg-red-50' },
+    { label: 'PPE Compliance Score', value: `${generateScore(96, 4)}%`, change: getSeededRandom(seed + 'ppe') > 0.5 ? '+0.5%' : '-0.2%', trend: getSeededRandom(seed + 'ppe') > 0.5 ? 'up' : 'down', icon: <HardHat className="text-primary" />, color: 'bg-primary-50' },
+    { label: 'Fire & Smoke Safety Score', value: '100%', change: 'Stable', trend: 'neutral', icon: <Flame className="text-red-600" />, color: 'bg-red-50' },
     { label: 'Overcrowding Score', value: `${generateScore(92, 5)}%`, change: '-1.2%', trend: 'down', icon: <Users className="text-orange-600" />, color: 'bg-orange-50' },
     { label: 'Violence-Free Score', value: '99.9%', change: '+0.1%', trend: 'up', icon: <ShieldAlert className="text-purple-600" />, color: 'bg-purple-50' },
     { label: 'Identity Match Rate', value: `${generateScore(98, 2)}%`, change: '+0.8%', trend: 'up', icon: <ScanFace className="text-emerald-600" />, color: 'bg-emerald-50' },
