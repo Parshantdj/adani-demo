@@ -363,7 +363,7 @@ export const Header: React.FC<HeaderProps> = ({
                           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary-200 hover:bg-primary-700 hover:scale-[1.02] active:scale-95 transition-all"
                         >
                           <Eye size={12} />
-                          View Event
+                          Respond Event
                         </button>
                       </div>
                     </div>

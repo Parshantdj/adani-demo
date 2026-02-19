@@ -41,7 +41,7 @@ export const LiveMonitoring: React.FC = () => {
   }, [runningInstances]);
   const detectionOptions = [
     { id: 'ppe', label: 'PPE Detection', icon: ShieldCheck, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-    { id: 'people', label: 'People Count', icon: Users, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { id: 'people', label: 'Over Crowd', icon: Users, color: 'text-blue-500', bg: 'bg-blue-50' },
     { id: 'fire', label: 'Fire & Smoke', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
     { id: 'violence', label: 'Violence', icon: Activity, color: 'text-red-500', bg: 'bg-red-50' },
   ];

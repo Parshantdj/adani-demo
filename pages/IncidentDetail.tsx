@@ -20,7 +20,7 @@ const BASE_PPE_LIFECYCLE_STEPS = [
     status: 'completed',
     timestamp: '10:15:32 AM',
     actor: 'System (Vision Engine)',
-    description: 'AI identified worker without helmet in high-risk zone with 94% confidence.',
+    description: 'AI-powered safety violation detection. ',
     details: [
       { key: 'Confidence Score', value: '94.2%' },
       { key: 'Analysis Time', value: '180ms' },

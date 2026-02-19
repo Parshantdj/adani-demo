@@ -146,7 +146,7 @@ export const VideoTelematics: React.FC = () => {
                             <video
                                 key={alarms[selectedAlarmId].video}
                                 src={alarms[selectedAlarmId].video}
-                                className="w-full h-full object-cover animate-in fade-in duration-500"
+                                className="w-full h-full object-contain animate-in fade-in duration-500"
                                 autoPlay
                                 loop
                                 muted
@@ -241,12 +241,11 @@ export const VideoTelematics: React.FC = () => {
             </div>
 
             {/* Right Map/Asset Hub */}
-            <div className="xl:col-span-7">
-                <div className="h-full min-h-[450px] bg-slate-100 rounded-xl border border-slate-200 shadow-2xl relative overflow-hidden group">
+            <div className="xl:col-span-7 rounded-xl overflow-hidden border border-slate-200 shadow-2xl relative group bg-cover bg-center" style={{ backgroundImage: "url('/image.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
+                <div className="h-full min-h-[450px] relative overflow-hidden">
                     {/* Map Layer (Thematic) */}
-                    <div className="absolute inset-0 bg-[#0f172a] flex items-center justify-center">
+                    <div className="absolute inset-0 bg-[#0f172a]/40 flex items-center justify-center">
                         <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent"></div>
-                        <Map size={450} className="text-slate-800/50" strokeWidth={0.5} />
                     </div>
 
                     <div className="absolute top-6 left-6 z-20 flex bg-slate-900/80 backdrop-blur-xl p-1 rounded-lg border border-white/10 shadow-2xl">
@@ -314,12 +313,12 @@ export const VideoTelematics: React.FC = () => {
 
             {/* Controller Section */}
             <div className="flex items-center justify-between">
-                <div className="flex bg-slate-200/60 p-2 rounded-xl gap-1.5 shadow-inner">
+                <div className="flex bg-slate-200/60 p-2 pb-0.5 rounded-xl gap-1 shadow-inner">
                     <button
                         onClick={() => setActiveTab('ALARMS')}
                         className={`flex items-center gap-3 px-10 py-2 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeTab === 'ALARMS'
                             ? 'bg-primary text-white shadow-[0_10px_30px_rgba(239,68,68,0.4)] translate-y-[-4px]'
-                            : 'text-slate-500 hover:bg-slate-300/40'
+                            : 'text-slate-500 hover:bg-slate-300/40 pb-4'
                             }`}
                     >
                         <Bell size={18} />
@@ -329,7 +328,7 @@ export const VideoTelematics: React.FC = () => {
                         onClick={() => setActiveTab('LIVE')}
                         className={`flex items-center gap-3 px-10 py-2 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${activeTab === 'LIVE'
                             ? 'bg-primary text-white shadow-[0_10px_30px_rgba(239,68,68,0.4)] translate-y-[-4px]'
-                            : 'text-slate-500 hover:bg-slate-300/40'
+                            : 'text-slate-500 hover:bg-slate-300/40 pb-4'
                             }`}
                     >
                         <Video size={18} />
@@ -337,18 +336,15 @@ export const VideoTelematics: React.FC = () => {
                     </button>
                 </div>
 
-                <div className="flex gap-3">
-                    <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm transition-all hover:border-primary/20">
-                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.1em]">Terminal A-02</span>
-                        <ChevronRight size={14} className="text-slate-300 rotate-90" />
-                    </div>
-                    <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm">
-                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.1em]">ADAS // DMS</span>
-                        <div className="flex -space-x-1 ml-2">
-                            <div className="w-4 h-4 rounded-full bg-blue-500 border-2 border-white"></div>
-                            <div className="w-4 h-4 rounded-full bg-slate-900 border-2 border-white"></div>
-                        </div>
-                    </div>
+                <div className="flex gap-2">
+                    <select className="bg-white px-5 py-2 rounded-xl border border-slate-200 shadow-sm text-[10px] font-black text-slate-900 uppercase tracking-[0.1em] focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer hover:border-primary/30 outline-none">
+                        <option>CAM 1</option>
+                        <option>CAM 2</option>
+                    </select>
+                    <select className="bg-white px-5 py-2 rounded-xl border border-slate-200 shadow-sm text-[10px] font-black text-slate-900 uppercase tracking-[0.1em] focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer hover:border-primary/30 outline-none">
+                        <option>DMS</option>
+                        <option>ADAS</option>
+                    </select>
                     <div className="flex items-center gap-2 bg-primary px-4 py-2 rounded-xl shadow-lg text-white group cursor-pointer hover:bg-primary/90 transition-all">
                         <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                         <span className="text-[10px] font-black uppercase tracking-[0.2em]">Live Events</span>
