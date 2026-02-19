@@ -206,24 +206,6 @@ export const VideoTelematics: React.FC = () => {
             <div className="xl:col-span-5 flex flex-col gap-4">
                 <div className="relative aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-slate-800/50 group hover:ring-2 ring-primary/40 transition-all">
                     <video
-                        src="https://vision-module-bsl.s3.ap-south-1.amazonaws.com/adanni_ppe_kit_detection/annotated/eec932d0-13ef-46d4-964f-0aa82e78d05f/recorded_screen_2026-02-19_13-02-54+(1).webm"
-                        className="w-full h-full object-cover"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                    />
-                    <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                            <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">DMS Live Feed</span>
-                        </div>
-                        <span className="text-[8px] font-black text-green-500 uppercase tracking-widest bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">LIVE</span>
-                    </div>
-                </div>
-
-                <div className="relative aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-slate-800/50 group hover:ring-2 ring-primary/40 transition-all">
-                    <video
                         src="https://vision-module-bsl.s3.ap-south-1.amazonaws.com/adanni_ppe_kit_detection/annotated/eec932d0-13ef-46d4-964f-0aa82e78d05f/ATT-10_19022026091739_seat_Belt_03.mp4"
                         className="w-full h-full object-cover"
                         autoPlay
@@ -234,7 +216,26 @@ export const VideoTelematics: React.FC = () => {
                     <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex justify-between items-center">
                         <div className="flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                            <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">ADAS Live Feed</span>
+                            <span className="text-[13px] font-black text-white uppercase tracking-[0.2em]">DMS Live Feed</span>
+                        </div>
+                        <span className="text-[8px] font-black text-green-500 uppercase tracking-widest bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">LIVE</span>
+                    </div>
+                </div>
+
+                <div className="relative aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-slate-800/50 group hover:ring-2 ring-primary/40 transition-all">
+
+                    <video
+                        src="https://vision-module-bsl.s3.ap-south-1.amazonaws.com/adanni_ppe_kit_detection/annotated/eec932d0-13ef-46d4-964f-0aa82e78d05f/recorded_screen_2026-02-19_13-02-54+(1).webm"
+                        className="w-full h-full object-cover"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                    />
+                    <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                            <span className="text-[13px] font-black text-white uppercase tracking-[0.2em]">ADAS Live Feed</span>
                         </div>
                         <span className="text-[8px] font-black text-green-500 uppercase tracking-widest bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">LIVE</span>
                     </div>
