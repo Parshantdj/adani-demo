@@ -96,12 +96,14 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
       const latestItems = apiData.slice(0, 5);
       const inc = latestItems[counter % latestItems.length];
 
+      console.log("inc", inc)
+
       const newEvent = {
         id: inc.id,
         event_id: inc.event_id,
         stream_id: inc.stream_id,
         s3_url: inc.s3_url,
-        type: inc.metadata.label,
+        type: inc.storage_class,
         zone: inc.metadata.zone_camera,
         time: new Date(inc.detected_at).toLocaleTimeString()
       };
@@ -188,6 +190,8 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
       };
     });
   }, [filteredIncidents]);
+
+  console.log("activeEvent", activeEvent)
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
