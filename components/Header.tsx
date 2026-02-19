@@ -37,19 +37,29 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [liveNotifications, setLiveNotifications] = useState<any[]>([]);
 
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch(`https://isafetyrobo.binarysemantics.org/api/violations?page=1&limit=10000`);
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
+      const incidents = data.incidents || [];
+      setLiveNotifications(incidents.slice(0, 15));
+      sessionStorage.setItem('adani_incidents_cache', JSON.stringify(incidents));
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      // Fallback to cache if API fails
+      const saved = sessionStorage.getItem('adani_incidents_cache');
+      if (saved) {
+        setLiveNotifications(JSON.parse(saved).slice(0, 15));
+      }
+    }
+  };
+
   useEffect(() => {
     if (apiData && apiData.length > 0) {
       setLiveNotifications(apiData.slice(0, 15));
     } else {
-      const saved = sessionStorage.getItem('adani_incidents_cache');
-      if (saved) {
-        const parsed = JSON.parse(saved).slice(0, 15);
-        // Only update if the data is actually different to prevent infinite loops
-        setLiveNotifications(prev => {
-          if (JSON.stringify(prev) === JSON.stringify(parsed)) return prev;
-          return parsed;
-        });
-      }
+      fetchNotifications();
     }
   }, [apiData]);
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
@@ -307,7 +317,12 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Notifications Popover */}
         <div className="relative" ref={notificationsRef}>
           <button
-            onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+            onClick={() => {
+              if (!isNotificationsOpen) {
+                fetchNotifications();
+              }
+              setIsNotificationsOpen(!isNotificationsOpen);
+            }}
             className={`relative p-2 rounded-xl transition-all ${isNotificationsOpen ? 'bg-white shadow-md text-primary ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-200/50'}`}
           >
             <Bell size={20} strokeWidth={2} />
