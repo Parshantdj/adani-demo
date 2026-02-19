@@ -331,8 +331,7 @@ export const AllIncidents: React.FC<AllIncidentsProps> = ({ onViewDetail }) => {
                   <td className="px-6 py-4 font-mono font-semibold text-primary text-xs">{inc.event_id.substring(0, 8)}...</td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <span className="font-semibold text-slate-800">{inc.metadata.label}</span>
-                      <span className="text-[10px] text-slate-400 font-semibold">{new Date(inc.detected_at).toLocaleString()}</span>
+                      <span className="text-[14px] text-slate-700 font-semibold">{inc.storage_class}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">

@@ -5,7 +5,7 @@ export const ProductOverview: React.FC = () => {
     <div className="flex flex-col h-full animate-in fade-in duration-500 bg-black">
       <div className="flex-1 overflow-hidden relative group">
         <video
-          src="https://vision-module-bsl.s3.amazonaws.com/videos/ppe_kit_detection/bbd81933-e1f7-4278-bbcd-44b5dfd18cea.mp4"
+          src="https://vision-module-bsl.s3.ap-south-1.amazonaws.com/adanni_ppe_kit_detection/annotated/eec932d0-13ef-46d4-964f-0aa82e78d05f/Plant+Safety+Preview1+(1).mp4"
           className="w-full h-full object-contain"
           controls
           autoPlay

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Bell, Calendar, ChevronDown, Monitor, Check, ChevronLeft, ChevronRight, Clock, LogOut, Settings, User, MapPin, Building2, ChevronRight as ChevronRightIcon, AlertTriangle, Eye, History, X, Info } from 'lucide-react';
+import { Search, Bell, Calendar, ChevronDown, Monitor, Check, ChevronLeft, ChevronRight, Clock, LogOut, Settings, User, MapPin, Building2, ChevronRight as ChevronRightIcon, AlertTriangle, Eye, History, X, Info, Camera } from 'lucide-react';
 import { SITE_HIERARCHY } from '../constants';
 
 interface HeaderProps {
@@ -18,6 +18,8 @@ interface HeaderProps {
   apiData?: any[];
 }
 
+const EMPTY_ARRAY: any[] = [];
+
 export const Header: React.FC<HeaderProps> = ({
   onLogout,
   eventHistory,
@@ -31,25 +33,29 @@ export const Header: React.FC<HeaderProps> = ({
   setEndDate,
   currentShift,
   setCurrentShift,
-  apiData = []
+  apiData = EMPTY_ARRAY
 }) => {
   const [liveNotifications, setLiveNotifications] = useState<any[]>([]);
 
   useEffect(() => {
-    // If apiData is passed from App.tsx (if we move fetching there) or we fetch here
-    // For now, let's sync from sessionStorage or pick from props
-    if (apiData.length > 0) {
+    if (apiData && apiData.length > 0) {
       setLiveNotifications(apiData.slice(0, 15));
     } else {
       const saved = sessionStorage.getItem('adani_incidents_cache');
       if (saved) {
-        setLiveNotifications(JSON.parse(saved).slice(0, 15));
+        const parsed = JSON.parse(saved).slice(0, 15);
+        // Only update if the data is actually different to prevent infinite loops
+        setLiveNotifications(prev => {
+          if (JSON.stringify(prev) === JSON.stringify(parsed)) return prev;
+          return parsed;
+        });
       }
     }
   }, [apiData]);
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
   const [hoveredBusiness, setHoveredBusiness] = useState<string | null>(null);
   const [hoveredSite, setHoveredSite] = useState<string | null>(null);
+  const [hoveredZone, setHoveredZone] = useState<string | null>(null);
   const [viewDate, setViewDate] = useState(new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isShiftDropdownOpen, setIsShiftDropdownOpen] = useState(false);
@@ -68,6 +74,7 @@ export const Header: React.FC<HeaderProps> = ({
         setIsPlantDropdownOpen(false);
         setHoveredBusiness(null);
         setHoveredSite(null);
+        setHoveredZone(null);
       }
       if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
         setIsDatePickerOpen(false);
@@ -190,13 +197,51 @@ export const Header: React.FC<HeaderProps> = ({
                           <span className={`text-sm ${currentSite === site.name ? 'font-semibold' : 'font-medium'}`}>{site.name}</span>
                           <ChevronRightIcon size={14} className="text-slate-300" />
                           {hoveredSite === site.name && (
-                            <div className="absolute left-[calc(100%-4px)] top-0 ml-1 bg-white border border-slate-200 rounded-2xl shadow-2xl min-w-[240px] max-h-[450px] overflow-y-auto py-2 z-[102] custom-scrollbar">
-                              {site.zones.map((zone) => (
-                                <div key={zone} className={`px-5 py-2.5 hover:bg-primary-50 cursor-pointer flex items-center gap-3 text-sm transition-colors ${currentSite.includes(zone) ? 'text-primary-700 font-semibold bg-primary-50/50' : 'text-slate-600'}`} onClick={(e) => { e.stopPropagation(); setCurrentSite(`${site.name} - ${zone}`); setIsPlantDropdownOpen(false); }}>
-                                  <MapPin size={12} className={currentSite.includes(zone) ? 'text-primary' : 'text-slate-300'} />
-                                  {zone}
-                                </div>
-                              ))}
+                            <div className="absolute left-[calc(100%-4px)] top-0 ml-1 bg-white border border-slate-200 rounded-2xl shadow-2xl min-w-[240px] py-2 z-[102]">
+                              {site.zones.map((zone) => {
+                                const hasCameras = zone === 'Container Terminal';
+                                const cameras = hasCameras ? ['CAM 1', 'CAM 2'] : [];
+
+                                return (
+                                  <div
+                                    key={zone}
+                                    className={`relative px-5 py-2.5 cursor-pointer flex items-center justify-between transition-colors ${hoveredZone === zone ? 'bg-primary-50 text-primary-700' : 'hover:bg-slate-50 text-slate-700'}`}
+                                    onMouseEnter={() => setHoveredZone(zone)}
+                                    onClick={(e) => {
+                                      if (!hasCameras) {
+                                        e.stopPropagation();
+                                        setCurrentSite(`${site.name} - ${zone}`);
+                                        setIsPlantDropdownOpen(false);
+                                      }
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <MapPin size={12} className={currentSite.includes(zone) ? 'text-primary' : 'text-slate-300'} />
+                                      <span className={`text-sm ${currentSite.includes(zone) ? 'font-semibold' : 'font-medium'}`}>{zone}</span>
+                                    </div>
+                                    {hasCameras && <ChevronRightIcon size={14} className="text-slate-300" />}
+
+                                    {hasCameras && hoveredZone === zone && (
+                                      <div className="absolute left-[calc(100%-2px)] top-0 ml-2 bg-white border border-slate-200 rounded-2xl shadow-2xl min-w-[180px] py-2 z-[110] animate-in fade-in slide-in-from-left-2 duration-200">
+                                        {cameras.map((cam) => (
+                                          <div
+                                            key={cam}
+                                            className={`px-5 py-2.5 hover:bg-primary-50 cursor-pointer flex items-center gap-3 text-sm transition-colors ${currentSite.includes(cam) ? 'text-primary-700 font-semibold bg-primary-50/50' : 'text-slate-600'}`}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setCurrentSite(`${site.name} - ${zone} - ${cam}`);
+                                              setIsPlantDropdownOpen(false);
+                                            }}
+                                          >
+                                            <Camera size={12} className={currentSite.includes(cam) ? 'text-primary' : 'text-slate-300'} />
+                                            {cam}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -288,7 +333,7 @@ export const Header: React.FC<HeaderProps> = ({
                             <AlertTriangle size={16} />
                           </div>
                           <div>
-                            <h4 className="text-sm font-semibold text-slate-900 leading-tight">{event.metadata.label}</h4>
+                            <h4 className="text-sm font-semibold text-slate-900 leading-tight">{event.storage_class}</h4>
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{event.metadata.zone_camera}</p>
                           </div>
                         </div>

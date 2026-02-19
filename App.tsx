@@ -32,6 +32,7 @@ import { ReportsAudit } from './pages/ReportsAudit';
 import { FaceEnrollment } from './pages/FaceEnrollment';
 import { AllIncidents } from './pages/AllIncidents';
 import { ProductOverview } from './pages/ProductOverview';
+import { VideoTelematics } from './pages/VideoTelematics';
 import { SITE_HIERARCHY } from './constants';
 
 const PlaceholderPage: React.FC<{ name: string }> = ({ name }) => (
@@ -103,6 +104,8 @@ const App: React.FC = () => {
         return <LiveMonitoring />;
       case PageType.PRODUCT_OVERVIEW:
         return <ProductOverview />;
+      case PageType.DASHBOARD_TELEMATICS:
+        return <VideoTelematics />;
       case PageType.INCIDENTS_ACTIVE:
         return <ActiveIncidents onViewDetail={handleNavigateToDetail} />;
       case PageType.INCIDENTS_PAST:
@@ -174,6 +177,7 @@ const App: React.FC = () => {
   }
 
   const isProductOverview = activePage === PageType.PRODUCT_OVERVIEW;
+  const isTelematics = activePage === PageType.DASHBOARD_TELEMATICS;
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden text-slate-900 selection:bg-primary-100">

@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-  LayoutDashboard, Video, AlertCircle, BarChart3, 
-  FileText, ShieldCheck, Settings, Users, Camera, 
-  Map, Activity, History, UserCheck, Flame, 
+import {
+  LayoutDashboard, Video, AlertCircle, BarChart3,
+  FileText, ShieldCheck, Settings, Users, Camera,
+  Map, Activity, History, UserCheck, Flame,
   HardHat, Thermometer, UserMinus, Sparkles, Clock, GitBranch,
   ShieldAlert, ScanFace, LogOut, MonitorPlay, FileSpreadsheet, Fingerprint, Layers
 } from 'lucide-react';
@@ -15,6 +15,7 @@ export const NAVIGATION_GROUPS = [
       { id: PageType.DASHBOARD_EXECUTIVE, label: 'Executive Overview', icon: <LayoutDashboard size={20} /> },
       { id: PageType.DASHBOARD_LIVE, label: 'Live Monitoring', icon: <Video size={20} />, badge: 'LIVE' },
       { id: PageType.PRODUCT_OVERVIEW, label: 'Product Overview', icon: <MonitorPlay size={20} /> },
+      { id: PageType.DASHBOARD_TELEMATICS, label: 'Video Telematics', icon: <Activity size={20} /> },
     ]
   },
   {
@@ -72,31 +73,31 @@ export const SITE_HIERARCHY = [
   {
     business: 'Ports & Logistics',
     sites: [
-      { 
-        name: 'Mundra Port', 
-        zones: ['Container Terminal', 'Bulk Cargo Zone', 'Liquid Terminal', 'Warehousing Hub', 'Logistics Park', 'SEZ Zone', 'Rail Yard / ICD'] 
+      {
+        name: 'Mundra Port',
+        zones: ['Container Terminal', 'Bulk Cargo Zone', 'Liquid Terminal', 'Warehousing Hub', 'Logistics Park', 'SEZ Zone', 'Rail Yard / ICD']
       },
-      { 
-        name: 'Krishnapatnam Port', 
-        zones: ['Container Yard', 'Multi-Purpose Terminal', 'Bulk Handling Area', 'Industrial Zone'] 
+      {
+        name: 'Krishnapatnam Port',
+        zones: ['Container Yard', 'Multi-Purpose Terminal', 'Bulk Handling Area', 'Industrial Zone']
       }
     ]
   },
   {
     business: 'Airports',
     sites: [
-      { 
-        name: 'Chhatrapati Shivaji Maharaj Int. Airport', 
-        zones: ['Passenger Terminal', 'Cargo Terminal', 'ATC Tower', 'Apron Area'] 
+      {
+        name: 'Chhatrapati Shivaji Maharaj Int. Airport',
+        zones: ['Passenger Terminal', 'Cargo Terminal', 'ATC Tower', 'Apron Area']
       }
     ]
   },
   {
     business: 'Power',
     sites: [
-      { 
-        name: 'Mundra Power Plant (Gujarat)', 
-        zones: ['Boiler Zone', 'Turbine Hall', 'Coal Handling Plant', 'Switchyard'] 
+      {
+        name: 'Mundra Power Plant (Gujarat)',
+        zones: ['Boiler Zone', 'Turbine Hall', 'Coal Handling Plant', 'Switchyard']
       }
     ]
   }

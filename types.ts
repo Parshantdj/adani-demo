@@ -40,6 +40,7 @@ export enum PageType {
   DASHBOARD_EXECUTIVE = 'dashboard-executive',
   DASHBOARD_LIVE = 'dashboard-live',
   PRODUCT_OVERVIEW = 'product-overview',
+  DASHBOARD_TELEMATICS = 'dashboard-telematics',
   INCIDENTS_ACTIVE = 'incidents-active',
   INCIDENTS_PAST = 'incidents-past',
   INCIDENTS_FALSE = 'incidents-false',

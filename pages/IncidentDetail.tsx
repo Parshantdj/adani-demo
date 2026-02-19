@@ -96,6 +96,8 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
     }
   }, [incidentId]);
 
+  console.log("incident", incident);
+
   if (!incident) {
     return (
       <div className="flex items-center justify-center p-20">
@@ -142,7 +144,7 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
               <span className="w-1 h-1 rounded-full bg-slate-300"></span>
               <span className="text-[10px] font-mono font-semibold text-primary">{incident.event_id.substring(0, 8)}</span>
             </div>
-            <h2 className="text-2xl font-semibold text-slate-900">{incident.metadata.label}</h2>
+            <h2 className="text-2xl font-semibold text-slate-900">{incident.storage_class}</h2>
           </div>
         </div>
         <div className="flex gap-3">
@@ -192,6 +194,12 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
                   <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Severity</p>
                   <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${incident.metadata.severity.toUpperCase() === 'CRITICAL' ? 'bg-red-600 text-white' : 'bg-orange-500 text-white'}`}>
                     {incident.metadata.severity}
+                  </span>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">DETECTION TYPE</p>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase`}>
+                    {incident.storage_class}
                   </span>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">

@@ -165,7 +165,7 @@ export const HeadcountConfig: React.FC = () => {
                                  </td>
                                  <td className="px-6 py-4">
                                     <span className={`px-2 py-1 rounded text-[10px] font-semibold uppercase tracking-widest ${zone.status === 'Active' ? 'bg-green-100 text-green-700' :
-                                          zone.status === 'Maintenance' ? 'bg-yellow-100 text-yellow-700' : 'bg-slate-100 text-slate-500'
+                                       zone.status === 'Maintenance' ? 'bg-yellow-100 text-yellow-700' : 'bg-slate-100 text-slate-500'
                                        }`}>
                                        {zone.status}
                                     </span>
