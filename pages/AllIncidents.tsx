@@ -53,7 +53,7 @@ export const AllIncidents: React.FC<AllIncidentsProps> = ({ onViewDetail }) => {
 
   const fetchIncidents = useCallback(async () => {
     try {
-      const response = await fetch(`http://3.109.39.11:9099/api/violations?page=1&limit=${ITEMS_PER_PAGE}`);
+      const response = await fetch(`https://isafetyrobo.binarysemantics.org/api/violations?page=1&limit=${ITEMS_PER_PAGE}`);
       if (!response.ok) throw new Error('Failed to fetch');
       const data: ApiResponse = await response.json();
 

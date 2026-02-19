@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { LineChart, BarChart, PieChart } from '@mui/x-charts';
 import { TrendingUp, AlertTriangle, ShieldCheck, Clock, ArrowUpRight, ArrowDownRight, MoreVertical, Camera, X, CheckCircle2, Circle, Loader2, Activity, HardHat, Flame, Users, ScanFace, Minus, ShieldAlert } from 'lucide-react';
 import { MOCK_INCIDENTS, SITE_HIERARCHY } from '../constants';
@@ -48,6 +48,32 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
   const [showActiveIncidentsModal, setShowActiveIncidentsModal] = useState(false);
   const [activeEvent, setActiveEvent] = useState<any>(null);
   const [isBannerVisible, setIsBannerVisible] = useState(false);
+  const [apiData, setApiData] = useState<any[]>(() => {
+    const saved = sessionStorage.getItem('adani_incidents_cache');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [loading, setLoading] = useState(apiData.length === 0);
+
+  const fetchIncidents = useCallback(async () => {
+    try {
+      const response = await fetch(`https://isafetyrobo.binarysemantics.org/api/violations?page=1&limit=10000`);
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
+      setApiData(data.incidents);
+      sessionStorage.setItem('adani_incidents_cache', JSON.stringify(data.incidents));
+      if (data.count) sessionStorage.setItem('adani_incidents_cache_count', data.count.toString());
+    } catch (error) {
+      console.error('Error fetching Executive incidents:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchIncidents();
+    const interval = setInterval(fetchIncidents, 10000);
+    return () => clearInterval(interval);
+  }, [fetchIncidents]);
 
   // 1. Resolve Target Zones based on currentSite selection
   const targetZones = useMemo(() => {
@@ -59,33 +85,34 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
     return ['Main Deck'];
   }, [currentSite]);
 
-  // 2. Refined Cycle Logic - 3s visible, 2s hidden gap
+  // 2. Cycle Logic for Live Banner - Pick latest 5 incidents from API
   useEffect(() => {
+    if (apiData.length === 0) return;
+
     let timeoutId: any;
     let counter = 0;
 
     const triggerBannerCycle = () => {
-      // Step 1: Show the banner
-      const type = CRITICAL_EVENT_TYPES[counter % CRITICAL_EVENT_TYPES.length];
-      const zone = targetZones[counter % targetZones.length];
+      const latestItems = apiData.slice(0, 5);
+      const inc = latestItems[counter % latestItems.length];
+
       const newEvent = {
-        id: Date.now(),
-        type,
-        zone,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        id: inc.id,
+        event_id: inc.event_id,
+        stream_id: inc.stream_id,
+        s3_url: inc.s3_url,
+        type: inc.metadata.label,
+        zone: inc.metadata.zone_camera,
+        time: new Date(inc.detected_at).toLocaleTimeString()
       };
 
       setActiveEvent(newEvent);
       setIsBannerVisible(true);
       counter++;
 
-      // Step 2: Set timeout to hide it after 3 seconds
       timeoutId = setTimeout(() => {
         setIsBannerVisible(false);
-        // Inform App that this event cycle is finished to add to history
         onEventComplete?.(newEvent);
-
-        // Step 3: Wait for 2 seconds of nothingness before showing next
         timeoutId = setTimeout(() => {
           triggerBannerCycle();
         }, 2000);
@@ -93,20 +120,21 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
     };
 
     triggerBannerCycle();
-
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [targetZones, onEventComplete]);
+  }, [apiData, onEventComplete]);
 
-  // 3. Filter Incidents
+  // 3. Filter Live Incidents for Charts/Tables
   const filteredIncidents = useMemo(() => {
-    return MOCK_INCIDENTS.filter(inc => targetZones.includes(inc.zone));
-  }, [targetZones]);
+    return apiData.filter(inc => {
+      return targetZones.length === 0 || targetZones.some(tz => inc.metadata.zone_camera.toLowerCase().includes(tz.toLowerCase()));
+    });
+  }, [apiData, targetZones]);
 
   // Helper to determine mock stage based on incident ID
-  const getMockStageIndex = (id: string) => {
-    const num = id.split('-').pop() || '0';
+  const getMockStageIndex = (id: number | string) => {
+    const num = id.toString().split('-').pop() || '0';
     return (parseInt(num) % 3) + 1;
   };
 
@@ -124,7 +152,7 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
     { label: 'Overcrowding Score', value: `${generateScore(92, 5)}%`, change: '-1.2%', trend: 'down', icon: <Users className="text-orange-600" />, color: 'bg-orange-50' },
     { label: 'Violence-Free Score', value: '99.9%', change: '+0.1%', trend: 'up', icon: <ShieldAlert className="text-purple-600" />, color: 'bg-purple-50' },
     { label: 'Identity Match Rate', value: `${generateScore(98, 2)}%`, change: '+0.8%', trend: 'up', icon: <ScanFace className="text-emerald-600" />, color: 'bg-emerald-50' },
-    { label: 'Active Incidents', value: filteredIncidents.filter(i => i.status === IncidentStatus.ACTIVE).length.toString(), change: 'Live', trend: 'neutral', icon: <Activity className="text-slate-600" />, color: 'bg-slate-100' },
+    { label: 'Active Incidents', value: filteredIncidents.filter(i => i.metadata.status.toUpperCase() === 'ACTIVE').length.toString(), change: 'Live', trend: 'neutral', icon: <Activity className="text-slate-600" />, color: 'bg-slate-100' },
   ];
 
   // 5. Generate Heatmap Data
@@ -180,8 +208,8 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
                   <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse"></span>
                   CRITICAL EVENT
                 </span>
-                <h2 className="text-lg font-semibold text-slate-800 tracking-tight">
-                  <span className="text-slate-900">{activeEvent.type}</span> at <span className="text-red-600 underline decoration-red-200 decoration-2 underline-offset-4 font-black">{activeEvent.zone}</span>
+                <h2 className="text-md font-semibold text-slate-800 tracking-tight">
+                  <span className="text-slate-900">{activeEvent.type}</span> at <span className="text-red-600 underline decoration-red-200 decoration-2 underline-offset-4 font-black">{activeEvent.zone.slice(0, 30)}</span>
                 </h2>
               </div>
             </div>
@@ -322,25 +350,25 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
                     <tr key={inc.id} className="hover:bg-slate-50 transition-colors cursor-pointer group">
                       <td className="px-6 py-4">
                         <div className="relative w-12 h-8 rounded border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center">
-                          {inc.thumbnailUrl ? (
-                            <img src={inc.thumbnailUrl} alt="Preview" className="w-full h-full object-cover" />
+                          {inc.s3_url ? (
+                            <img src={inc.s3_url} alt="Preview" className="w-full h-full object-cover" />
                           ) : (
                             <Camera size={12} className="text-slate-300" />
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 font-mono font-medium text-primary">{inc.id}</td>
-                      <td className="px-6 py-4 font-medium text-slate-700">{inc.type}</td>
-                      <td className="px-6 py-4 text-slate-500">{inc.zone}</td>
+                      <td className="px-6 py-4 font-mono font-medium text-primary">{inc.event_id.substring(0, 8)}</td>
+                      <td className="px-6 py-4 font-medium text-slate-700">{inc.metadata.label}</td>
+                      <td className="px-6 py-4 text-slate-500">{inc.metadata.zone_camera}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider ${inc.severity === 'Critical' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}>
-                          {inc.severity}
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider ${inc.metadata.severity.toLowerCase() === 'critical' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}>
+                          {inc.metadata.severity}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <span className="flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                          <span className="text-xs font-semibold text-red-600">{inc.status}</span>
+                          <span className={`w-2 h-2 rounded-full animate-pulse ${inc.metadata.status.toUpperCase() === 'ACTIVE' ? 'bg-red-500' : 'bg-blue-500'}`}></span>
+                          <span className={`text-xs font-semibold ${inc.metadata.status.toUpperCase() === 'ACTIVE' ? 'text-red-600' : 'text-blue-600'}`}>{inc.metadata.status}</span>
                         </span>
                       </td>
                     </tr>
@@ -400,8 +428,8 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
             </div>
 
             <div className="overflow-y-auto p-6 space-y-4 bg-slate-50/30">
-              {filteredIncidents.filter(i => i.status === IncidentStatus.ACTIVE).length > 0 ?
-                filteredIncidents.filter(i => i.status === IncidentStatus.ACTIVE).map((incident, idx) => {
+              {filteredIncidents.filter(i => i.metadata.status.toUpperCase() === 'ACTIVE').length > 0 ?
+                filteredIncidents.filter(i => i.metadata.status.toUpperCase() === 'ACTIVE').map((incident, idx) => {
                   const currentStageIndex = getMockStageIndex(incident.id);
                   const progressPercentage = (currentStageIndex / (LIFECYCLE_STAGES.length - 1)) * 100;
 
@@ -410,22 +438,22 @@ export const ExecutiveOverview: React.FC<ExecutiveOverviewProps> = ({
                       <div className="flex justify-between items-start mb-8">
                         <div className="flex items-center gap-4">
                           <div className="relative w-20 h-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                            {incident.thumbnailUrl ? (
-                              <img src={incident.thumbnailUrl} className="w-full h-full object-cover" alt="Thumb" />
+                            {incident.s3_url ? (
+                              <img src={incident.s3_url} className="w-full h-full object-cover" alt="Thumb" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-slate-300"><Camera size={16} /></div>
                             )}
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-black text-primary uppercase tracking-widest">{incident.id}</span>
-                              <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded text-white uppercase ${incident.severity === 'Critical' ? 'bg-red-600' : incident.severity === 'High' ? 'bg-orange-500' : 'bg-primary'}`}>{incident.severity}</span>
+                              <span className="text-xs font-black text-primary uppercase tracking-widest">{incident.event_id.substring(0, 8)}</span>
+                              <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded text-white uppercase ${incident.metadata.severity.toLowerCase() === 'critical' ? 'bg-red-600' : incident.metadata.severity.toLowerCase() === 'high' ? 'bg-orange-500' : 'bg-primary'}`}>{incident.metadata.severity}</span>
                             </div>
-                            <h4 className="font-semibold text-slate-900 text-sm mb-0.5">{incident.type}</h4>
+                            <h4 className="font-semibold text-slate-900 text-sm mb-0.5">{incident.metadata.label}</h4>
                             <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
-                              <span className="bg-slate-100 px-1.5 py-0.5 rounded">{incident.zone}</span>
+                              <span className="bg-slate-100 px-1.5 py-0.5 rounded">{incident.metadata.zone_camera}</span>
                               <span className="text-slate-300">•</span>
-                              {incident.timestamp}
+                              {new Date(incident.detected_at).toLocaleString()}
                             </p>
                           </div>
                         </div>

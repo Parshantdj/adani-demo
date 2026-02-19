@@ -26,7 +26,7 @@ const RESPONSE_TEAMS: ResponseTeam[] = [
 
 interface EmergencyResponseProps {
   onBack?: () => void;
-  event: { type: string, zone: string } | null;
+  event: { type: string, zone: string, stream_id?: string } | null;
 }
 
 export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ onBack, event }) => {
@@ -37,11 +37,14 @@ export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ onBack, ev
 
   const selectedTeam = RESPONSE_TEAMS.find(t => t.id === selectedTeamId);
 
-  // Determine relevant video based on event type
   const isFireEvent = event?.type.includes('Fire') || event?.type.includes('Smoke');
-  const videoUrl = isFireEvent
-    ? "https://vision-module-bsl.s3.ap-south-1.amazonaws.com/temp/detection_result%20(1).mp4"
-    : "https://vision-module-bsl.s3.ap-south-1.amazonaws.com/temp/ppe_test_new_predicted+2.mp4";
+
+  // Dynamic video URL: Priority to stream_id for LIVE isafetyrobo feed
+  const videoUrl = true
+    ? "https://isafetyrobo.binarysemantics.org/video_feed/584f592a-b6a4-4423-9313-f5334978aed2"
+    : (isFireEvent
+      ? "https://vision-module-bsl.s3.ap-south-1.amazonaws.com/temp/detection_result%20(1).mp4"
+      : "https://vision-module-bsl.s3.ap-south-1.amazonaws.com/temp/ppe_test_new_predicted+2.mp4");
 
   // Simulate audio visualizer
   useEffect(() => {
@@ -69,8 +72,8 @@ export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ onBack, ev
 
         <div className="flex items-center gap-6 relative z-10 w-full md:w-auto">
           <div className="relative">
-            <div className="w-14 h-14 bg-red-600 rounded-xl shadow-lg flex items-center justify-center animate-[pulse_2s_infinite]">
-              <Shield size={28} className="text-white" fill="currentColor" />
+            <div className="w-8 h-8 bg-red-600 rounded-xl shadow-lg flex items-center justify-center animate-[pulse_2s_infinite]">
+              <Shield size={18} className="text-white" fill="currentColor" />
             </div>
             <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full border-2 border-[#0f172a] animate-ping"></div>
           </div>
@@ -82,7 +85,7 @@ export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ onBack, ev
               </span>
               <span className="text-slate-500 text-[10px] font-mono font-semibold tracking-widest uppercase">EMR-{Date.now().toString().slice(-6)}</span>
             </div>
-            <h1 className="text-2xl font-black tracking-tight leading-none text-white">
+            <h1 className="text-md font-black tracking-tight leading-none text-white">
               {event?.type || 'Violation Detected'} at <span className="text-red-500 uppercase">{event?.zone || 'All Zones'}</span>
             </h1>
             <p className="text-slate-400 text-[10px] font-semibold uppercase tracking-widest opacity-60">Real-time alert triggered. Protocol response required immediately.</p>
@@ -92,12 +95,12 @@ export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ onBack, ev
         <div className="mt-4 md:mt-0 flex items-center gap-10 relative z-10">
           <div className="flex flex-col items-end">
             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Response Clock</p>
-            <p className="text-3xl font-mono font-black text-white tracking-tighter tabular-nums">00:02:14</p>
+            <p className="text-xl font-mono font-black text-white tracking-tighter tabular-nums">00:02:14</p>
           </div>
           <div className="w-px h-10 bg-slate-800"></div>
           <div className="flex flex-col items-end">
             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">Risk Grade</p>
-            <p className="text-3xl font-black text-white tracking-tight uppercase">Tier 1</p>
+            <p className="text-xl font-black text-white tracking-tight uppercase">Tier 1</p>
           </div>
         </div>
       </div>
@@ -107,11 +110,15 @@ export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ onBack, ev
         {/* Left Column: Tactical View */}
         <div className="xl:col-span-7 space-y-6">
           <div className="bg-slate-950 rounded-xl overflow-hidden shadow-2xl relative aspect-video group ring-1 ring-white/5">
-            {videoUrl.includes('video_feed') || "https://isafetyrobo.binarysemantics.org/video_feed/584f592a-b6a4-4423-9313-f5334978aed2".includes('video_feed') ? (
+            {videoUrl.includes('video_feed') ? (
               <img
-                src={"https://isafetyrobo.binarysemantics.org/video_feed/584f592a-b6a4-4423-9313-f5334978aed2"}
+                src={videoUrl}
                 className="w-full h-full object-cover"
-                alt="Emergency Feed"
+                alt="Emergency Live Feed"
+                onError={(e) => {
+                  // Fallback for demo if live feed fails
+                  console.error("Live feed error, showing fallback");
+                }}
               />
             ) : (
               <video

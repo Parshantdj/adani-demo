@@ -15,6 +15,7 @@ interface HeaderProps {
   setEndDate: (date: Date | null) => void;
   currentShift: string;
   setCurrentShift: (shift: string) => void;
+  apiData?: any[];
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -29,8 +30,23 @@ export const Header: React.FC<HeaderProps> = ({
   endDate,
   setEndDate,
   currentShift,
-  setCurrentShift
+  setCurrentShift,
+  apiData = []
 }) => {
+  const [liveNotifications, setLiveNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    // If apiData is passed from App.tsx (if we move fetching there) or we fetch here
+    // For now, let's sync from sessionStorage or pick from props
+    if (apiData.length > 0) {
+      setLiveNotifications(apiData.slice(0, 15));
+    } else {
+      const saved = sessionStorage.getItem('adani_incidents_cache');
+      if (saved) {
+        setLiveNotifications(JSON.parse(saved).slice(0, 15));
+      }
+    }
+  }, [apiData]);
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
   const [hoveredBusiness, setHoveredBusiness] = useState<string | null>(null);
   const [hoveredSite, setHoveredSite] = useState<string | null>(null);
@@ -250,7 +266,7 @@ export const Header: React.FC<HeaderProps> = ({
             className={`relative p-2 rounded-xl transition-all ${isNotificationsOpen ? 'bg-white shadow-md text-primary ring-1 ring-slate-200' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-200/50'}`}
           >
             <Bell size={20} strokeWidth={2} />
-            {eventHistory.length > 0 && <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-slate-50"></span>}
+            {liveNotifications.length > 0 && <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-slate-50"></span>}
           </button>
 
           {isNotificationsOpen && (
@@ -263,8 +279,8 @@ export const Header: React.FC<HeaderProps> = ({
                 <button onClick={() => setIsNotificationsOpen(false)} className="p-1 hover:bg-slate-200 rounded-full text-slate-400 transition-colors"><X size={16} /></button>
               </div>
               <div className="max-h-[420px] overflow-y-auto no-scrollbar py-2">
-                {eventHistory.length > 0 ? (
-                  eventHistory.map((event) => (
+                {liveNotifications.length > 0 ? (
+                  liveNotifications.map((event) => (
                     <div key={event.id} className="px-5 py-4 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 group">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-3">
@@ -272,16 +288,16 @@ export const Header: React.FC<HeaderProps> = ({
                             <AlertTriangle size={16} />
                           </div>
                           <div>
-                            <h4 className="text-sm font-semibold text-slate-900 leading-tight">{event.type}</h4>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{event.zone}</p>
+                            <h4 className="text-sm font-semibold text-slate-900 leading-tight">{event.metadata.label}</h4>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{event.metadata.zone_camera}</p>
                           </div>
                         </div>
-                        <span className="text-[10px] font-semibold text-slate-400 font-mono">{event.time}</span>
+                        <span className="text-[10px] font-semibold text-slate-400 font-mono">{new Date(event.detected_at).toLocaleTimeString()}</span>
                       </div>
                       <div className="flex justify-end mt-3 gap-2">
                         <button
                           onClick={() => {
-                            onViewIncident(event.id);
+                            onViewIncident(event.event_id);
                             setIsNotificationsOpen(false);
                           }}
                           className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all"
@@ -291,7 +307,12 @@ export const Header: React.FC<HeaderProps> = ({
                         </button>
                         <button
                           onClick={() => {
-                            onViewEvent(event);
+                            onViewEvent({
+                              type: event.metadata.label,
+                              zone: event.metadata.zone_camera,
+                              stream_id: event.stream_id,
+                              s3_url: event.s3_url
+                            });
                             setIsNotificationsOpen(false);
                           }}
                           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary-200 hover:bg-primary-700 hover:scale-[1.02] active:scale-95 transition-all"
