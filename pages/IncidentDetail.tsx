@@ -4,7 +4,7 @@ import { MOCK_INCIDENTS } from '../constants';
 import {
   ArrowLeft, Camera, ShieldAlert, Clock, MapPin,
   User, CheckCircle2, AlertCircle, Zap, Activity,
-  Shield, GitBranch, MessageSquare, Download, Share2
+  Shield, GitBranch, MessageSquare, Download, Share2, Maximize2, X
 } from 'lucide-react';
 import { IncidentStatus } from '../types';
 
@@ -79,9 +79,32 @@ const BASE_PPE_LIFECYCLE_STEPS = [
   }
 ];
 
+const CACHE_KEY = 'adani_incidents_cache';
+
 export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBack }) => {
-  const incident = MOCK_INCIDENTS.find(inc => inc.id === incidentId) || MOCK_INCIDENTS[0];
-  const isResolved = incident.status === IncidentStatus.RESOLVED;
+  const [incident, setIncident] = React.useState<any>(null);
+  const [isEnlarged, setIsEnlarged] = React.useState(false);
+
+  React.useEffect(() => {
+    const saved = sessionStorage.getItem(CACHE_KEY);
+    if (saved) {
+      const allIncidents = JSON.parse(saved);
+      const found = allIncidents.find((inc: any) => inc.event_id === incidentId);
+      if (found) {
+        setIncident(found);
+      }
+    }
+  }, [incidentId]);
+
+  if (!incident) {
+    return (
+      <div className="flex items-center justify-center p-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  const isResolved = incident.metadata.status.toUpperCase() === 'RESOLVED';
 
   // Transform steps based on incident resolution status
   const displaySteps = BASE_PPE_LIFECYCLE_STEPS.map(step => {
@@ -117,9 +140,9 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Incident Record</span>
               <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-              <span className="text-[10px] font-mono font-semibold text-primary">{incident.id}</span>
+              <span className="text-[10px] font-mono font-semibold text-primary">{incident.event_id.substring(0, 8)}</span>
             </div>
-            <h2 className="text-2xl font-semibold text-slate-900">{incident.type}</h2>
+            <h2 className="text-2xl font-semibold text-slate-900">{incident.metadata.label}</h2>
           </div>
         </div>
         <div className="flex gap-3">
@@ -143,23 +166,23 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
                 <Camera size={14} /> Critical Evidence Frame
               </span>
-              <span className="text-[10px] font-mono text-slate-400">CAM: {incident.camera}</span>
+              <span className="text-[10px] font-mono text-slate-400">STREAM: {incident.stream_id.substring(0, 8)}</span>
             </div>
-            <div className="aspect-[4/3] relative bg-slate-900 overflow-hidden group">
+            <div
+              className="aspect-[4/3] relative bg-slate-900 overflow-hidden group cursor-zoom-in"
+              onClick={() => setIsEnlarged(true)}
+            >
               <img
-                src={incident.thumbnailUrl || 'https://picsum.photos/seed/incident/800/600'}
+                src={incident.s3_url || 'https://picsum.photos/seed/incident/800/600'}
                 className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700"
                 alt="Evidence"
               />
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute border-2 border-red-500 w-1/3 h-1/2 top-1/4 left-1/3 bg-red-500/10 animate-pulse">
-                  <div className="bg-red-600 text-[8px] font-semibold text-white px-1.5 py-0.5 absolute -top-5 left-0 whitespace-nowrap uppercase tracking-widest shadow-lg">
-                    NO HELMET (0.94)
-                  </div>
-                </div>
+
+              <div className="absolute top-4 right-4 p-2 bg-black/40 backdrop-blur-md rounded-lg border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Maximize2 size={16} className="text-white" />
               </div>
               <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center bg-black/40 backdrop-blur-md p-2 rounded-lg border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-[10px] text-white font-semibold tracking-widest font-mono">ENLARGED DETECTION VIEW</span>
+                <span className="text-[10px] text-white font-semibold tracking-widest font-mono">CLICK TO ENLARGE EVIDENCE</span>
                 <button className="text-white hover:text-primary-400 transition-colors"><CheckCircle2 size={16} /></button>
               </div>
             </div>
@@ -167,15 +190,15 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
                   <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Severity</p>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${incident.severity === 'Critical' ? 'bg-red-600 text-white' : 'bg-orange-500 text-white'}`}>
-                    {incident.severity}
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${incident.metadata.severity.toUpperCase() === 'CRITICAL' ? 'bg-red-600 text-white' : 'bg-orange-500 text-white'}`}>
+                    {incident.metadata.severity}
                   </span>
                 </div>
                 <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
                   <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Status</p>
                   <div className="flex items-center gap-1.5">
-                    <div className={`w-1.5 h-1.5 rounded-full ${incident.status === IncidentStatus.RESOLVED ? 'bg-green-500' : 'bg-red-500 animate-pulse'}`}></div>
-                    <span className="text-[10px] font-semibold text-slate-900 uppercase tracking-widest">{incident.status}</span>
+                    <div className={`w-1.5 h-1.5 rounded-full ${isResolved ? 'bg-green-500' : 'bg-red-500 animate-pulse'}`}></div>
+                    <span className="text-[10px] font-semibold text-slate-900 uppercase tracking-widest">{incident.metadata.status}</span>
                   </div>
                 </div>
               </div>
@@ -185,21 +208,21 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
                   <div className="p-2 bg-primary-50 text-primary rounded-lg"><MapPin size={18} /></div>
                   <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Zone Location</p>
-                    <p className="text-sm font-semibold text-slate-800">{incident.zone}</p>
+                    <p className="text-sm font-semibold text-slate-800">{incident.metadata.zone_camera}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-purple-50 text-purple-600 rounded-lg"><Clock size={18} /></div>
                   <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Detected On</p>
-                    <p className="text-sm font-semibold text-slate-800">{incident.timestamp}</p>
+                    <p className="text-sm font-semibold text-slate-800">{new Date(incident.detected_at).toLocaleString()}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-green-50 text-green-600 rounded-lg"><User size={18} /></div>
                   <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Assigned Owner</p>
-                    <p className="text-sm font-semibold text-slate-800">{incident.assignedTo}</p>
+                    <p className="text-sm font-semibold text-slate-800">{incident.metadata.owner}</p>
                   </div>
                 </div>
               </div>
@@ -258,8 +281,8 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
                 <div key={step.id} className={`relative group ${step.status === 'pending' ? 'opacity-40 grayscale' : ''}`}>
                   {/* Step Marker */}
                   <div className={`absolute -left-12 w-12 h-12 flex items-center justify-center rounded-full border-4 border-white shadow-md z-10 transition-all ${step.status === 'completed' ? 'bg-green-500 text-white' :
-                      step.status === 'active' ? 'bg-indigo-600 text-white scale-110 shadow-indigo-100 animate-pulse' :
-                        'bg-slate-100 text-slate-400'
+                    step.status === 'active' ? 'bg-indigo-600 text-white scale-110 shadow-indigo-100 animate-pulse' :
+                      'bg-slate-100 text-slate-400'
                     }`}>
                     {step.status === 'completed' ? <CheckCircle2 size={24} /> :
                       step.id === 1 ? <Zap size={24} /> :
@@ -272,8 +295,8 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
 
                   {/* Step Content Card */}
                   <div className={`p-6 rounded-2xl border transition-all ${step.status === 'active'
-                      ? 'bg-indigo-50/30 border-indigo-200 shadow-lg shadow-indigo-50'
-                      : 'bg-white border-slate-100'
+                    ? 'bg-indigo-50/30 border-indigo-200 shadow-lg shadow-indigo-50'
+                    : 'bg-white border-slate-100'
                     }`}>
                     <div className="flex items-center justify-between mb-4">
                       <div>
@@ -289,8 +312,8 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
                         </div>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest ${step.status === 'completed' ? 'bg-green-100 text-green-700' :
-                          step.status === 'active' ? 'bg-indigo-600 text-white' :
-                            'bg-slate-100 text-slate-500'
+                        step.status === 'active' ? 'bg-indigo-600 text-white' :
+                          'bg-slate-100 text-slate-500'
                         }`}>
                         {step.status}
                       </span>
@@ -327,6 +350,45 @@ export const IncidentDetail: React.FC<IncidentDetailProps> = ({ incidentId, onBa
           {/* Action Footer removed per user request: "Current Task: Corrective Action card is not required." */}
         </div>
       </div>
+
+      {/* Enlarged Image Modal */}
+      {isEnlarged && (
+        <div
+          className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-300"
+          onClick={() => setIsEnlarged(false)}
+        >
+          <button
+            className="absolute top-8 right-8 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md border border-white/10 transition-all z-[110]"
+            onClick={() => setIsEnlarged(false)}
+          >
+            <X size={24} />
+          </button>
+
+          <div className="relative w-full max-w-6xl aspect-video bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-white/5 animate-in zoom-in-95 duration-300">
+            <img
+              src={incident.s3_url || 'https://picsum.photos/seed/incident/800/600'}
+              className="w-full h-full object-contain"
+              alt="Enlarged Evidence"
+            />
+            {/* Redetect overlay in large view too */}
+
+
+            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+              <div className="flex items-center gap-4 text-white">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">STREAM ID</span>
+                  <span className="text-sm font-mono">{incident.stream_id}</span>
+                </div>
+                <div className="w-px h-8 bg-white/20"></div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">TIMESTAMP</span>
+                  <span className="text-sm font-semibold">{new Date(incident.detected_at).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

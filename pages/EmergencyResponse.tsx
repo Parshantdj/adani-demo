@@ -107,15 +107,23 @@ export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ onBack, ev
         {/* Left Column: Tactical View */}
         <div className="xl:col-span-7 space-y-6">
           <div className="bg-slate-950 rounded-xl overflow-hidden shadow-2xl relative aspect-video group ring-1 ring-white/5">
-            <video
-              key={videoUrl}
-              src={videoUrl}
-              className="w-full h-full object-cover"
-              autoPlay
-              loop
-              muted
-              playsInline
-            />
+            {videoUrl.includes('video_feed') || "https://isafetyrobo.binarysemantics.org/video_feed/584f592a-b6a4-4423-9313-f5334978aed2".includes('video_feed') ? (
+              <img
+                src={"https://isafetyrobo.binarysemantics.org/video_feed/584f592a-b6a4-4423-9313-f5334978aed2"}
+                className="w-full h-full object-cover"
+                alt="Emergency Feed"
+              />
+            ) : (
+              <video
+                key={videoUrl}
+                src={videoUrl}
+                className="w-full h-full object-cover"
+                autoPlay
+                loop
+                muted
+                playsInline
+              />
+            )}
             {/* HUD widgets removed as requested */}
           </div>
 
@@ -198,10 +206,10 @@ export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ onBack, ev
                   key={team.id}
                   onClick={() => team.status === 'Available' && setSelectedTeamId(team.id)}
                   className={`relative p-4 rounded-xl border-2 transition-all cursor-pointer group ${selectedTeamId === team.id
-                      ? 'border-primary bg-primary-50/40 shadow-lg ring-4 ring-primary-50'
-                      : team.status === 'Available'
-                        ? 'border-slate-100 bg-white hover:border-primary-300 hover:shadow-md'
-                        : 'border-slate-100 bg-slate-50 opacity-50 cursor-not-allowed grayscale'
+                    ? 'border-primary bg-primary-50/40 shadow-lg ring-4 ring-primary-50'
+                    : team.status === 'Available'
+                      ? 'border-slate-100 bg-white hover:border-primary-300 hover:shadow-md'
+                      : 'border-slate-100 bg-slate-50 opacity-50 cursor-not-allowed grayscale'
                     }`}
                 >
                   <div className="flex justify-between items-start mb-3">

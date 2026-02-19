@@ -550,9 +550,9 @@ export const LiveMonitoring: React.FC = () => {
                     <span className="bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-xl text-[11px] font-mono font-semibold text-primary-400 border border-white/10 uppercase tracking-widest shadow-2xl max-w-[150px] truncate">
                       {cam.camera_name}
                     </span>
-                    <span className="text-white font-black text-xs drop-shadow-xl tracking-tight uppercase bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-xl border border-white/5 truncate max-w-[200px]">
+                    {/* <span className="text-white font-black text-xs drop-shadow-xl tracking-tight uppercase bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-xl border border-white/5 truncate max-w-[200px]">
                       {cam.name}
-                    </span>
+                    </span> */}
                     {cam.module_name && (
                       <span className="bg-primary/20 backdrop-blur-md px-3 py-1 rounded-xl text-[9px] font-black text-primary border border-primary/30 uppercase tracking-[0.2em] shadow-lg">
                         {cam.module_name}
@@ -564,7 +564,19 @@ export const LiveMonitoring: React.FC = () => {
               </div>
 
               <div className="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex justify-between items-center opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 duration-500 z-30">
-                <div className="flex gap-2.5">
+                <div className="flex flex-wrap gap-2 max-w-[70%]">
+                  {detectionOptions
+                    .filter(opt => activeDetections.includes(opt.id))
+                    .map((opt) => (
+                      <div
+                        key={opt.id}
+                        className="flex items-center gap-1.5 px-2 py-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/10 shadow-lg animate-in fade-in slide-in-from-left-2 duration-300"
+                      >
+                        <opt.icon size={10} className={opt.color} />
+                        <span className="text-[8px] font-black text-white uppercase tracking-wider">{opt.label}</span>
+                      </div>
+                    ))
+                  }
                 </div>
                 <div className="flex gap-2.5">
                   <button

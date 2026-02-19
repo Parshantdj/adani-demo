@@ -108,7 +108,7 @@ const App: React.FC = () => {
       case PageType.INCIDENTS_PAST:
         return <PastIncidents onViewDetail={handleNavigateToDetail} />;
       case PageType.INCIDENTS_DETAIL:
-        return <IncidentDetail incidentId={selectedIncidentId} onBack={() => setActivePage(PageType.INCIDENTS_ACTIVE)} />;
+        return <IncidentDetail incidentId={selectedIncidentId} onBack={() => setActivePage(PageType.ALL_INCIDENTS)} />;
       case PageType.EMERGENCY_RESPONSE:
         return <EmergencyResponse event={activeEmergency} onBack={() => setActivePage(PageType.DASHBOARD_EXECUTIVE)} />;
       case PageType.INCIDENTS_FALSE:
