@@ -5,6 +5,7 @@ import {
     MapPin, Maximize2, Mic, Settings, User, Clock,
     Car, Gauge, Navigation
 } from 'lucide-react';
+import mapImage from '../image.png';
 
 export const VideoTelematics: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'ALARMS' | 'LIVE'>('ALARMS');
@@ -241,7 +242,7 @@ export const VideoTelematics: React.FC = () => {
             </div>
 
             {/* Right Map/Asset Hub */}
-            <div className="xl:col-span-7 rounded-xl overflow-hidden border border-slate-200 shadow-2xl relative group bg-cover bg-center" style={{ backgroundImage: "url('/image.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
+            <div className="xl:col-span-7 rounded-xl overflow-hidden border border-slate-200 shadow-2xl relative group bg-cover bg-center" style={{ backgroundImage: `url(${mapImage})`, backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}>
                 <div className="h-full min-h-[450px] relative overflow-hidden">
                     {/* Map Layer (Thematic) */}
                     <div className="absolute inset-0 bg-[#0f172a]/40 flex items-center justify-center">
