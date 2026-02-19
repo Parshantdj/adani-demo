@@ -24,7 +24,7 @@ export const LiveMonitoring: React.FC = () => {
   }, [instanceTargetTypes]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Online' | 'Offline'>('All');
-  const [activeDetections, setActiveDetections] = useState<string[]>(['ppe', 'people', 'violence']);
+  const [activeDetections, setActiveDetections] = useState<string[]>(['ppe', 'people', 'violence', 'fire']);
   const [peopleThreshold, setPeopleThreshold] = useState<number>(5);
   const [showConfigWarning, setShowConfigWarning] = useState(false);
   const [startResponse, setStartResponse] = useState<any>(null);
