@@ -563,7 +563,7 @@ export const LiveMonitoring: React.FC = () => {
                 </div>
               </div>
 
-              <div className="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex justify-between items-center opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 duration-500 z-30">
+              {cam.module_name && cam.module_name === "Crowd  Detection" && <div className="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex justify-between items-center opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 duration-500 z-30">
                 <div className="flex flex-wrap gap-2 max-w-[70%]">
                   {detectionOptions
                     .filter(opt => activeDetections.includes(opt.id))
@@ -587,7 +587,7 @@ export const LiveMonitoring: React.FC = () => {
                     <Maximize2 size={18} />
                   </button>
                 </div>
-              </div>
+              </div>}
 
               <div className="absolute bottom-5 right-5 text-right pointer-events-none group-hover:opacity-0 transition-opacity z-10">
                 <p className="text-[10px] font-mono text-primary-400 font-semibold uppercase tracking-[0.2em] drop-shadow-lg">

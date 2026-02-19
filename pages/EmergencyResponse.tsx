@@ -37,12 +37,11 @@ export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ onBack, ev
 
   const selectedTeam = RESPONSE_TEAMS.find(t => t.id === selectedTeamId);
 
-  const isFireEvent = event?.type.includes('Fire') || event?.type.includes('Smoke');
 
   // Dynamic video URL: Priority to stream_id for LIVE isafetyrobo feed
   const videoUrl = true
     ? "https://isafetyrobo.binarysemantics.org/video_feed/584f592a-b6a4-4423-9313-f5334978aed2"
-    : (isFireEvent
+    : (false
       ? "https://vision-module-bsl.s3.ap-south-1.amazonaws.com/temp/detection_result%20(1).mp4"
       : "https://vision-module-bsl.s3.ap-south-1.amazonaws.com/temp/ppe_test_new_predicted+2.mp4");
 
@@ -110,15 +109,13 @@ export const EmergencyResponse: React.FC<EmergencyResponseProps> = ({ onBack, ev
         {/* Left Column: Tactical View */}
         <div className="xl:col-span-7 space-y-6">
           <div className="bg-slate-950 rounded-xl overflow-hidden shadow-2xl relative aspect-video group ring-1 ring-white/5">
+
             {videoUrl.includes('video_feed') ? (
               <img
+                key={videoUrl}
                 src={videoUrl}
                 className="w-full h-full object-cover"
                 alt="Emergency Live Feed"
-                onError={(e) => {
-                  // Fallback for demo if live feed fails
-                  console.error("Live feed error, showing fallback");
-                }}
               />
             ) : (
               <video
