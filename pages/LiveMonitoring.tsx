@@ -7,6 +7,8 @@ import {
   Flame, ShieldCheck, Users, Activity
 } from 'lucide-react';
 
+const token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE4NDk3NzEsInN1YiI6IjEifQ.de9Xy6uyRauyoIskQ6ASGnoixISZAyM4obLKAwszAFg"
+
 export const LiveMonitoring: React.FC = () => {
   const [gridSize, setGridSize] = useState(2);
   const [expandedCamId, setExpandedCamId] = useState<string | null>(null);
@@ -111,7 +113,7 @@ export const LiveMonitoring: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE1ODYwNjIsInN1YiI6IjEifQ.aCHs_IJMOLsPg_1nMAMAJoh9JmQXGbNi-u0CB9G2y6U'
+          'Authorization': token
         },
         body: JSON.stringify({
           conf: 0,
@@ -128,7 +130,7 @@ export const LiveMonitoring: React.FC = () => {
         const detailResponse = await fetch(`https://devvisionapi.binarysemantics.com/v1/vision/generic/${moduleId}/instance/${instanceId}`, {
           method: 'GET',
           headers: {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE1ODYwNjIsInN1YiI6IjEifQ.aCHs_IJMOLsPg_1nMAMAJoh9JmQXGbNi-u0CB9G2y6U'
+            'Authorization': token
           }
         });
         const detailData = await detailResponse.json();
@@ -161,7 +163,7 @@ export const LiveMonitoring: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE1ODYwNjIsInN1YiI6IjEifQ.aCHs_IJMOLsPg_1nMAMAJoh9JmQXGbNi-u0CB9G2y6U'
+          'Authorization': token
         }
       });
       const data = await response.json();
@@ -211,7 +213,7 @@ export const LiveMonitoring: React.FC = () => {
         const fetchPromises = userIds.map(id =>
           fetch(`https://devvisionapi.binarysemantics.com/v1/vision/generic/${id}/list_instance`, {
             headers: {
-              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE1ODYwNjIsInN1YiI6IjEifQ.aCHs_IJMOLsPg_1nMAMAJoh9JmQXGbNi-u0CB9G2y6U'
+              'Authorization': token
             }
           }).then(res => res.json())
         );
@@ -260,7 +262,7 @@ export const LiveMonitoring: React.FC = () => {
             const detailResponse = await fetch(`https://devvisionapi.binarysemantics.com/v1/vision/generic/${cam.module_id}/instance/${cam.id}`, {
               method: 'GET',
               headers: {
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE1ODYwNjIsInN1YiI6IjEifQ.aCHs_IJMOLsPg_1nMAMAJoh9JmQXGbNi-u0CB9G2y6U'
+                'Authorization': token
               }
             });
             const detailData = await detailResponse.json();
@@ -310,7 +312,7 @@ export const LiveMonitoring: React.FC = () => {
             const detailResponse = await fetch(`https://devvisionapi.binarysemantics.com/v1/vision/generic/${activeCam.module_id}/instance/${activeCam.id}`, {
               method: 'GET',
               headers: {
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzE1ODYwNjIsInN1YiI6IjEifQ.aCHs_IJMOLsPg_1nMAMAJoh9JmQXGbNi-u0CB9G2y6U'
+                'Authorization': token
               }
             });
             const detailData = await detailResponse.json();
