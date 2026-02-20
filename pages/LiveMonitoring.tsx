@@ -553,31 +553,32 @@ export const LiveMonitoring: React.FC = () => {
                     {/* <span className="text-white font-black text-xs drop-shadow-xl tracking-tight uppercase bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-xl border border-white/5 truncate max-w-[200px]">
                       {cam.name}
                     </span> */}
-                    {cam.module_name && (
+                    {cam.module_name !== "Crowd  Detection" && (
                       <span className="bg-primary/20 backdrop-blur-md px-3 py-1 rounded-xl text-[9px] font-black text-primary border border-primary/30 uppercase tracking-[0.2em] shadow-lg">
                         {cam.module_name}
                       </span>
                     )}
+                    {cam.module_name && cam.module_name === "Crowd  Detection" && <div className="flex flex-wrap gap-2 max-w-[70%]">
+                      {detectionOptions
+                        .filter(opt => activeDetections.includes(opt.id))
+                        .map((opt) => (
+                          <div
+                            key={opt.id}
+                            className="flex items-center gap-1.5 px-2 py-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/10 shadow-lg animate-in fade-in slide-in-from-left-2 duration-300"
+                          >
+                            <opt.icon size={10} className={opt.color} />
+                            <span className="text-[8px] font-black text-white uppercase tracking-wider">{opt.label}</span>
+                          </div>
+                        ))
+                      }
+                    </div>}
                   </div>
 
                 </div>
               </div>
 
               <div className="absolute bottom-0 left-0 w-full p-5 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex justify-between items-center opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0 duration-500 z-30">
-                {cam.module_name && cam.module_name === "Crowd  Detection" && <div className="flex flex-wrap gap-2 max-w-[70%]">
-                  {detectionOptions
-                    .filter(opt => activeDetections.includes(opt.id))
-                    .map((opt) => (
-                      <div
-                        key={opt.id}
-                        className="flex items-center gap-1.5 px-2 py-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/10 shadow-lg animate-in fade-in slide-in-from-left-2 duration-300"
-                      >
-                        <opt.icon size={10} className={opt.color} />
-                        <span className="text-[8px] font-black text-white uppercase tracking-wider">{opt.label}</span>
-                      </div>
-                    ))
-                  }
-                </div>}
+
                 <div></div>
                 <div className="flex gap-2.5">
                   <button
@@ -680,7 +681,7 @@ export const LiveMonitoring: React.FC = () => {
                 <div className="grid grid-cols-12 px-8 py-4 bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em] border-b border-slate-50">
                   <div className="col-span-3">Time</div>
                   <div className="col-span-6">Live Event</div>
-                  <div className="col-span-3 text-right">Grade</div>
+                  <div className="col-span-3 text-right">Confidence Score</div>
                 </div>
 
                 <div className="divide-y divide-slate-50">
@@ -692,17 +693,15 @@ export const LiveMonitoring: React.FC = () => {
                     activeSocketEvents.map((log, idx) => (
                       <div key={idx} className="grid grid-cols-12 px-8 py-5 hover:bg-slate-50/80 transition-colors items-center group animate-in slide-in-from-right duration-300">
                         <div className="col-span-3 text-[14px] font-semibold text-slate-600">{log.time}</div>
-                        <div className="col-span-6 pr-4">
+                        <div className="col-span-4 pr-4">
                           <p className={`text-sm font-semibold tracking-tight ${log.severity === 'CRITICAL' ? 'text-red-600' : 'text-slate-800'}`}>
                             {log.event}
                           </p>
-                          <p className="text-[13px] font-semibold text-gray-600 mt-1 opacity-60">{activeCam?.module_name} | <span className='text-green-600'>{log.conf}</span></p>
                         </div>
-                        <div className="col-span-3 text-right">
-                          <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${log.severity === 'CRITICAL' ? 'bg-red-600 text-white shadow-xl shadow-red-100' :
-                            'bg-slate-100 text-slate-600'
+                        <div className="col-span-5 text-right text-green-600 font-semibold">
+                          <span className={`px-2 py-1 rounded-lg text-[13px] uppercase text-green-700'
                             }`}>
-                            {log.severity}
+                            {log.conf}
                           </span>
                         </div>
                       </div>
