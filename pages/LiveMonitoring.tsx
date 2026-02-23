@@ -66,15 +66,34 @@ export const LiveMonitoring: React.FC = () => {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+        if (!data || !data.instance_id) return;
+
         console.log('WebSocket Incoming Data:', data);
-        const detections = data?.detections || [];
-        const details = data?.details || [];
+
+        const detections = Array.isArray(data?.detections) ? data.detections : [];
+        const details = Array.isArray(data?.details) ? data.details : [];
         const isCrowd = targetTypesRef.current[data.instance_id];
+
+        const formatConf = (val: any) => {
+          if (!val) return '0%';
+          const parsed = parseFloat(val);
+          return isNaN(parsed) ? '0%' : `${(parsed * 100).toFixed(0)}%`;
+        };
+
+        const formatEvent = (evt: any) => {
+          if (!evt) return 'Detection Event';
+          if (typeof evt === 'string') return evt;
+          if (Array.isArray(evt)) {
+            return evt.map(d => typeof d === 'string' ? d : (d.label || d.type || 'Detection')).join(', ');
+          }
+          return evt.label || evt.type || 'Detection Event';
+        };
+
         const newEvent = !isCrowd ? {
           instance_id: data.instance_id,
           time: data?.time || new Date().toLocaleTimeString(),
-          event: data.detections || 'Detection Event',
-          conf: details[0]?.confidence ? `${(parseFloat(details[0].confidence) * 100).toFixed(0)}%` : '0%',
+          event: formatEvent(data.detections),
+          conf: formatConf(details[0]?.confidence),
           severity: data.severity || (data.alert ? 'CRITICAL' : 'LOW'),
           user: data.user || data.name || 'System'
         } : {
@@ -82,13 +101,13 @@ export const LiveMonitoring: React.FC = () => {
           severity: data.severity || (data.alert ? 'CRITICAL' : 'LOW'),
           time: data?.time || new Date().toLocaleTimeString(),
           people_count: data.people_count,
-          conf: detections[0]?.confidence ? `${(parseFloat(detections[0].confidence) * 100).toFixed(0)}%` : '0%',
-          event: detections[0]?.label || data.type || 'Detection Event',
+          conf: formatConf(detections[0]?.confidence),
+          event: formatEvent(detections[0]?.label || data.type),
           is_overcrowded: data.is_overcrowded,
         };
         setSocketEvents(prev => [newEvent, ...prev].slice(0, 100));
       } catch (err) {
-        console.error('WS Parse Error:', err);
+        console.error('WS Parse Error: ', err);
       }
     };
     ws.onclose = () => {
@@ -701,8 +720,7 @@ export const LiveMonitoring: React.FC = () => {
                           </p>
                         </div>
                         <div className="col-span-5 text-right text-green-600 font-semibold">
-                          <span className={`px-2 py-1 rounded-lg text-[13px] uppercase text-green-700'
-                            }`}>
+                          <span className="px-2 py-1 rounded-lg text-[13px] uppercase text-green-700">
                             {log.conf}
                           </span>
                         </div>
