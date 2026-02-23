@@ -1,6 +1,223 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Bell, Calendar, ChevronDown, Monitor, Check, ChevronLeft, ChevronRight, Clock, LogOut, Settings, User, MapPin, Building2, ChevronRight as ChevronRightIcon, AlertTriangle, Eye, History, X, Info, Camera } from 'lucide-react';
-import { SITE_HIERARCHY } from '../constants';
+
+const SITE_HIERARCHY = [
+  {
+    business: 'Ports & Logistics',
+    sites: [
+      {
+        name: 'Mundra Port',
+        zones: [
+          { name: 'Container Terminal', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Main Gate & Security Check', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Bulk Cargo Terminal', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Liquid Terminal', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Rail Yard', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      },
+      {
+        name: 'Hazira Port',
+        zones: [
+          { name: 'Gate Complex', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Container Terminal', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Storage Yard', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Jetty Area', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Liquid Handling Zone', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      },
+      {
+        name: 'Dhamra Port',
+        zones: [
+          { name: 'Entry Gate', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Coal Handling Plant', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Conveyor Corridor', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Railway Siding', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Berth Area', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      }
+    ]
+  },
+  {
+    business: 'Thermal Power',
+    sites: [
+      {
+        name: 'Mundra Power Plant',
+        zones: [
+          { name: 'Boiler Zone', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Turbine Hall', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Coal Handling Plant', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Ash Handling Area', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Switchyard', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      },
+      {
+        name: 'Tiroda Power Plant',
+        zones: [
+          { name: 'Boiler Section', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Turbine Hall', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Coal Yard', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Control Room', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Electrical Substation', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      }
+    ]
+  },
+  {
+    business: 'Renewable Energy',
+    sites: [
+      {
+        name: 'Rajasthan Solar Park',
+        zones: [
+          { name: 'Solar Panel Field', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Inverter Room', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Control Room', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Grid Substation', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Maintenance Bay', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      },
+      {
+        name: 'Khavda Renewable Park',
+        zones: [
+          { name: 'Wind Turbine Field', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Solar Hybrid Zone', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Power Evacuation Yard', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Control Building', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Security Gate', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      }
+    ]
+  },
+  {
+    business: 'Airports',
+    sites: [
+      {
+        name: 'Chhatrapati Shivaji Maharaj International Airport',
+        zones: [
+          { name: 'Terminal Building', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Baggage Handling Area', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Airside / Runway', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Cargo Terminal', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Security Check Zone', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      },
+      {
+        name: 'Sardar Vallabhbhai Patel International Airport',
+        zones: [
+          { name: 'Terminal Hall', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Cargo Zone', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Apron Area', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'ATC Control Zone', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Entry Gate', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      }
+    ]
+  },
+  {
+    business: 'Mining',
+    sites: [
+      {
+        name: 'Talabira Coal Mine',
+        zones: [
+          { name: 'Excavation Zone', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Drilling & Blasting Area', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Coal Stockyard', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Loading Yard', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Workshop Area', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      },
+      {
+        name: 'Gare Palma Mine',
+        zones: [
+          { name: 'Excavation Zone', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Haul Road', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Crusher Area', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Conveyor Belt', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Dispatch Yard', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      }
+    ]
+  },
+  {
+    business: 'LNG Infrastructure',
+    sites: [
+      {
+        name: 'Dhamra LNG Terminal',
+        zones: [
+          { name: 'LNG Storage Tanks', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Regasification Unit', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Jetty', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Control Room', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Safety Monitoring Zone', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      }
+    ]
+  },
+  {
+    business: 'Gas Distribution',
+    sites: [
+      {
+        name: 'Ahmedabad CGD',
+        zones: [
+          { name: 'Pipeline Corridor', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'CNG Station', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Metering Station', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Maintenance Depot', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Control Center', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      }
+    ]
+  },
+  {
+    business: 'Data Centers',
+    sites: [
+      {
+        name: 'Chennai Data Center',
+        zones: [
+          { name: 'Server Hall', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Network Operations Center', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Power Backup Room', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Cooling Plant', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Access Control Lobby', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      },
+      {
+        name: 'Hyderabad Data Center',
+        zones: [
+          { name: 'Server Hall', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'NOC', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Electrical Room', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Cooling Zone', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Security Gate', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      }
+    ]
+  },
+  {
+    business: 'Defense & Aerospace',
+    sites: [
+      {
+        name: 'Hyderabad Facility',
+        zones: [
+          { name: 'Assembly Line', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Testing Lab', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Secure Storage', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Quality Inspection', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Control Room', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      },
+      {
+        name: 'Ahmedabad Defense Facility',
+        zones: [
+          { name: 'Manufacturing Bay', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Calibration Lab', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Secure Entry', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'Component Storage', cameras: ['CAM 1', 'CAM 2'] },
+          { name: 'R&D Lab', cameras: ['CAM 1', 'CAM 2'] }
+        ]
+      }
+    ]
+  }
+];
 
 interface HeaderProps {
   onLogout?: () => void;
@@ -208,30 +425,30 @@ export const Header: React.FC<HeaderProps> = ({
                           <ChevronRightIcon size={14} className="text-slate-300" />
                           {hoveredSite === site.name && (
                             <div className="absolute left-[calc(100%-4px)] top-0 ml-1 bg-white border border-slate-200 rounded-2xl shadow-2xl min-w-[240px] py-2 z-[102]">
-                              {site.zones.map((zone) => {
-                                const hasCameras = zone === 'Container Terminal';
-                                const cameras = hasCameras ? ['CAM 1', 'CAM 2'] : [];
+                              {site.zones.map((zoneData) => {
+                                const hasCameras = zoneData.cameras && zoneData.cameras.length > 0;
+                                const cameras = zoneData.cameras || [];
 
                                 return (
                                   <div
-                                    key={zone}
-                                    className={`relative px-5 py-2.5 cursor-pointer flex items-center justify-between transition-colors ${hoveredZone === zone ? 'bg-primary-50 text-primary-700' : 'hover:bg-slate-50 text-slate-700'}`}
-                                    onMouseEnter={() => setHoveredZone(zone)}
+                                    key={zoneData.name}
+                                    className={`relative px-5 py-2.5 cursor-pointer flex items-center justify-between transition-colors ${hoveredZone === zoneData.name ? 'bg-primary-50 text-primary-700' : 'hover:bg-slate-50 text-slate-700'}`}
+                                    onMouseEnter={() => setHoveredZone(zoneData.name)}
                                     onClick={(e) => {
                                       if (!hasCameras) {
                                         e.stopPropagation();
-                                        setCurrentSite(`${site.name} - ${zone}`);
+                                        setCurrentSite(`${site.name} - ${zoneData.name}`);
                                         setIsPlantDropdownOpen(false);
                                       }
                                     }}
                                   >
                                     <div className="flex items-center gap-3">
-                                      <MapPin size={12} className={currentSite.includes(zone) ? 'text-primary' : 'text-slate-300'} />
-                                      <span className={`text-sm ${currentSite.includes(zone) ? 'font-semibold' : 'font-medium'}`}>{zone}</span>
+                                      <MapPin size={12} className={currentSite.includes(zoneData.name) ? 'text-primary' : 'text-slate-300'} />
+                                      <span className={`text-sm ${currentSite.includes(zoneData.name) ? 'font-semibold' : 'font-medium'}`}>{zoneData.name}</span>
                                     </div>
                                     {hasCameras && <ChevronRightIcon size={14} className="text-slate-300" />}
 
-                                    {hasCameras && hoveredZone === zone && (
+                                    {hasCameras && hoveredZone === zoneData.name && (
                                       <div className="absolute left-[calc(100%-2px)] top-0 ml-2 bg-white border border-slate-200 rounded-2xl shadow-2xl min-w-[180px] py-2 z-[110] animate-in fade-in slide-in-from-left-2 duration-200">
                                         {cameras.map((cam) => (
                                           <div
@@ -239,7 +456,7 @@ export const Header: React.FC<HeaderProps> = ({
                                             className={`px-5 py-2.5 hover:bg-primary-50 cursor-pointer flex items-center gap-3 text-sm transition-colors ${currentSite.includes(cam) ? 'text-primary-700 font-semibold bg-primary-50/50' : 'text-slate-600'}`}
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              setCurrentSite(`${site.name} - ${zone} - ${cam}`);
+                                              setCurrentSite(`${site.name} - ${zoneData.name} - ${cam}`);
                                               setIsPlantDropdownOpen(false);
                                             }}
                                           >
@@ -309,10 +526,10 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-6">
-        <div className="relative group">
+        {/* <div className="relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary" size={16} />
           <input type="text" placeholder="Universal search..." className="pl-9 pr-4 py-2 bg-slate-200/40 border-transparent border rounded-xl text-xs w-64 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white focus:border-primary/30 transition-all placeholder:text-slate-400 font-medium" />
-        </div>
+        </div> */}
 
         {/* Notifications Popover */}
         <div className="relative" ref={notificationsRef}>
