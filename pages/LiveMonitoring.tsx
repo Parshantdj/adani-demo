@@ -159,7 +159,7 @@ export const LiveMonitoring: React.FC = () => {
         const isCrowdDetection = targetCam?.module_name === "Crowd  Detection";
         setInstanceTargetTypes(prev => ({ ...prev, [instanceId]: isCrowdDetection }));
         const newVideoUrl = isCrowdDetection
-          ? detailData?.detail?.[0]?.data?.pp_url
+          ? detailData?.detail?.[0]?.data?.documents?.[0]?.video_urls?.output_url
           : detailData?.detail?.[0]?.data?.documents?.[0]?.video_urls?.output_url;
         if (newVideoUrl) {
           setCameras(prev => prev.map(cam =>
@@ -288,7 +288,7 @@ export const LiveMonitoring: React.FC = () => {
 
             const isCrowdDetection = cam.module_name === "Crowd  Detection";
             const restoredUrl = isCrowdDetection
-              ? detailData?.detail?.[0]?.data?.pp_url
+              ? detailData?.detail?.[0]?.data?.documents?.[0]?.video_urls?.output_url
               : detailData?.detail?.[0]?.data?.documents?.[0]?.video_urls?.output_url;
 
             setInstanceTargetTypes(prev => ({ ...prev, [instanceId]: isCrowdDetection }));
@@ -338,7 +338,7 @@ export const LiveMonitoring: React.FC = () => {
             const isCrowdDetection = activeCam.module_name === "Crowd  Detection";
             setInstanceTargetTypes(prev => ({ ...prev, [activeCam.id]: isCrowdDetection }));
             const restoredUrl = isCrowdDetection
-              ? detailData?.detail?.[0]?.data?.pp_url
+              ? detailData?.detail?.[0]?.data?.documents?.[0]?.video_urls?.output_url
               : detailData?.detail?.[0]?.data?.documents?.[0]?.video_urls?.output_url;
             if (restoredUrl) {
               setCameras(prev => prev.map(cam =>
