@@ -7,7 +7,7 @@ import {
   Flame, ShieldCheck, Users, Activity
 } from 'lucide-react';
 
-const token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzMwMzgwMDYsInN1YiI6IjEifQ.4RCnHO8ZHZ8DgOzA01gw_36mqcyt5VfItUGbj0auXSc"
+const token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzMzMTE1MzIsInN1YiI6IjEifQ.ct5clNZ6-GhLiTv38e2QkWnSaiPm0EZLaZFjY7rxreE"
 
 export const LiveMonitoring: React.FC = () => {
   const [gridSize, setGridSize] = useState(2);
