@@ -11,6 +11,7 @@ import {
   Loader2,
   Power,
   PowerOff,
+  CloudCog,
 } from "lucide-react";
 
 interface ApiIncident {
@@ -236,6 +237,8 @@ export const AllIncidents: React.FC<AllIncidentsProps> = ({ onViewDetail }) => {
     setCurrentPage(1);
   };
 
+  console.log("filteredData", filteredData)
+
   const getSeverityStyles = (severity: string) => {
     const s = severity.toUpperCase();
     if (s === "CRITICAL") return "bg-red-600 text-white shadow-sm";
@@ -428,6 +431,9 @@ export const AllIncidents: React.FC<AllIncidentsProps> = ({ onViewDetail }) => {
                 <th className="px-6 py-4 bg-slate-100 border-b border-slate-200">
                   ZONE / CAMERA
                 </th>
+                <th className="px-6 py-4 bg-slate-100 border-b border-slate-200">
+                  Created AT
+                </th>
                 <th className="px-6 py-4 bg-slate-100 border-b border-slate-200 text-right">
                   ACTION
                 </th>
@@ -516,6 +522,14 @@ export const AllIncidents: React.FC<AllIncidentsProps> = ({ onViewDetail }) => {
                         <span className="text-[10px] text-slate-400">
                           {inc.stream_id.substring(0, 8)}
                         </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-slate-700 font-medium text-xs max-w-[150px] truncate">
+                          {new Date(inc.detected_at).toLocaleString()}
+                        </span>
+
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
